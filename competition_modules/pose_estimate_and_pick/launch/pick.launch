@@ -1,0 +1,3 @@
+<launch>
+<node pkg="pose_estimate_and_pick" type="pick_object.py" name="pick_object" output="screen"/>
+</launch>
