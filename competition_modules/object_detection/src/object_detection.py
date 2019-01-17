@@ -14,7 +14,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
 import scipy.misc
-import os, sys, random, time, cv2
+import os, sys, time, cv2
 
 if '/opt/ros/kinetic/lib/python2.7/dist-packages' in sys.path:
     sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
@@ -126,7 +126,7 @@ def make_layers(cfg, batch_norm=False):
 
 def find_contour(frame , h , w , min_size):
     ret, thresh = cv2.threshold(frame, 127, 255, cv2.THRESH_BINARY)
-    _, tmp_contours, hierarchy = cv2.findContours( thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    tmp_contours, hierarchy = cv2.findContours( thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
     contour = []
     contour_area = []
     contour_center_x_position = []
@@ -159,10 +159,10 @@ if __name__ == "__main__":
         fcn_model = fcn_model.cuda()
         fcn_model = nn.DataParallel(fcn_model, device_ids=num_gpu)
 
-    model_dir = "";
-    model_path = os.path.join(model_dir, "FCNs_mini_competition_batch10_epoch9_RMSprop_lr0.0001.pkl")
 
-    fcn_model.load_state_dict(model_path)
+    model_path = "FCNs_mini_competition_batch10_epoch9_RMSprop_lr0.0001.pkl"
+
+    fcn_model.load_state_dict(torch.load(model_path))
 
 
     cap = cv2.VideoCapture(0)
@@ -173,6 +173,8 @@ if __name__ == "__main__":
 
         if (ret != True):
             break
+
+        show_image = img.copy()
 
         img = np.transpose(img,(2,0,1))/255.
 
@@ -191,21 +193,25 @@ if __name__ == "__main__":
         test_N, _, test_h, test_w = output_img.shape
         pred_img = output_img.transpose(0, 2, 3, 1).reshape(-1, n_class).argmax(axis = 1).reshape(test_N, test_h, test_w)
 
-        output_frame = cv2.inRange(test_pred[i], 1, 3)
-        count, contours, area, x, y = find_contour(output_frame , output_frame.shape[0] , output_frame.shape[1] , 15)  
 
-        cv2.drawContours(output_frame , contours , -1 , 128 , thickness=2)
+        for i in range(1, 4, 1):
 
-        center_position = []
-        for items in range(count): 
-            cv2.circle(output_frame, (x[items] , y[items]), 2, 128, 5)
-            center_position.append((x[items] , y[items]))
+	        output_frame = cv2.inRange(pred_img[0], i, i)
+
+	        count, contours, area, x, y = find_contour(output_frame , output_frame.shape[0] , output_frame.shape[1] , 20)  
+
+	        cv2.drawContours(show_image , contours , -1 , (0,0,255) , thickness=2)
+
+	        center_position = []
+	        
+	        for items in range(count): 
+	            cv2.circle(show_image, (x[items] , y[items]), 2, (0,0,255), 5)
+	            cv2.putText(show_image, str(x[items])+","+str(y[items]), (x[items] , y[items]),cv2.FONT_HERSHEY_SIMPLEX,1, (0, 255, 255), 1, cv2.LINE_AA)
+	            center_position.append((x[items] , y[items]))
 
 
-        cv2.imshow("output", output_frame)
-
-
-
+        cv2.imshow("out", show_image)
+        cv2.waitKey(1)
 
 
 
