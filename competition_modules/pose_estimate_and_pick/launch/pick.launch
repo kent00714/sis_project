@@ -1,3 +1,6 @@
+<?xml version="1.0" ?>
 <launch>
-<node pkg="pose_estimate_and_pick" type="pick_object.py" name="pick_object" output="screen"/>
+
+  <node name="pick_object" pkg="pose_estimate_and_pick" type="pick_object.py" output="screen"/>
+
 </launch>
