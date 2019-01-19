@@ -10,6 +10,9 @@ project(pose_estimate_and_pick)
 find_package(catkin REQUIRED
     message_generation
     std_msgs
+    roscpp
+  	geometry_msgs
+  	tf
 )
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -198,3 +201,7 @@ ${catkin_INCLUDE_DIRS}
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+add_executable(chad_transform src/chad_transform.cpp)
+target_link_libraries(chad_transform ${catkin_LIBRARIES})
+add_dependencies(chad_transform ${catkin_LIBRARIES})
