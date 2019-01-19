@@ -1,5 +1,5 @@
 ## import file 
-## target received a point msgs then pick object back to home position
+## target received a point msgs then pick object back to home position [prepare to test] 
 import sys
 import rospy
 import moveit_commander
