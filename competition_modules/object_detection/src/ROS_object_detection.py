@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+
 import torch, torchvision
 import torch.nn as nn
 import torch.optim as optim
@@ -13,15 +15,9 @@ import rospy
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 
-from sklearn.metrics import confusion_matrix
-from matplotlib import pyplot as plt
-import numpy as np
-import pandas as pd
-import scipy.misc
-import os, sys, time, cv2
 
-if '/opt/ros/kinetic/lib/python2.7/dist-packages' in sys.path:
-    sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
+import numpy as np
+import os, sys, time, cv2
 
 
 ranges = {
@@ -131,7 +127,7 @@ def make_layers(cfg, batch_norm=False):
 
 
 
-class ROS_NODE(object)
+class ROS_NODE(object):
 
     def __init__(self,model_path):
         self.vgg_model = VGGNet(requires_grad=True, remove_fc=True)
@@ -149,7 +145,7 @@ class ROS_NODE(object)
         rospy.init_node('Object_detection', anonymous=True)
 
         self.subscriber = rospy.Subscriber("/camera/rgb/image_rect_color", Image, self.callback)
-        self.publisher  = rospy.Publisher("/Object_detection/mask", Image)
+        self.publisher  = rospy.Publisher("/Object_detection/mask", Image, 1)
 
         self.bridge = CvBridge()
 
@@ -175,7 +171,7 @@ class ROS_NODE(object)
         input_img = torch.from_numpy(image).cuda()
         input_img = input_img.float()
 
-        output_img = fcn_model(input_img)
+        output_img = self.fcn_model(input_img)
         output_img = output_img.data.cpu().numpy()
 
         test_N, _, test_h, test_w = output_img.shape
@@ -190,11 +186,11 @@ class ROS_NODE(object)
 
             output_frame = cv2.dilate(output_frame,None,iterations = 3)
 
-            count, contours, area, x, y = find_contour(output_frame , output_frame.shape[0] , output_frame.shape[1] , 20)  
+            count, contours, area, x, y = self.find_contour(output_frame , output_frame.shape[0] , output_frame.shape[1] , 20)  
 
             center_position = []
 
-            mask[i - 1,:,:] = output_frame
+            mask[:,:, i-1] = output_frame
             
 
         try:
@@ -208,7 +204,7 @@ class ROS_NODE(object)
 
     def find_contour(self, frame , h , w , min_size):
         ret, thresh = cv2.threshold(frame, 127, 255, cv2.THRESH_BINARY)
-        tmp_contours, hierarchy = cv2.findContours( thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+        _, tmp_contours, hierarchy = cv2.findContours( thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
         contour = []
         contour_area = []
         contour_center_x_position = []
