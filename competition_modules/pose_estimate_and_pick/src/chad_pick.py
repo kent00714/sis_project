@@ -15,7 +15,7 @@ class pick_object(object):
 	def __init__(self):
 		# initial publisher for gripper command topic which is used for gripper control
 		self.pub_gripper = rospy.Publisher("/gripper_joint/command", Float64, queue_size=1)
-		self.sub_goal = rospy.Subscriber("/sis_competition/chadlin/object", Point, callback, queue_size = 1)
+		self.sub_goal = rospy.Subscriber("/sis_competition/chadlin/object", Point, self.callback, queue_size = 1)
 		
 		check = True
 		# you need to check if moveit server is open or not
@@ -59,32 +59,19 @@ class pick_object(object):
 		### Go home
 		self.home() 
 
-		
-
-		# After determining a specific point where arm should move, we input x,y,z,degree to calculate joint value for each wrist. 
-
-		# ik_4dof.ik_solver(x, y, z, degree)
-		print "pose goal"
-		print pose_goal.position.x, pose_goal.position.y, pose_goal.position.z
-
-		joint_value = ik_4dof.ik_solver(pose_goal.position.x, pose_goal.position.y, pose_goal.position.z, -90)
-
-		# Reference: https://ros-planning.github.io/moveit_tutorials/doc/move_group_python_interface/move_group_python_interface_tutorial.html
-
-
-		### Go home
-		#self.home() 
-
-	def close(self)
+	def close(self):
 		# close gripper
+		print "=================="
 		print "close gripper"
 		rospy.sleep(2)
 		grip_data = Float64()
 		grip_data.data = 2.0 
 		self.pub_gripper.publish(grip_data)
 		rospy.sleep(2)
+		print "=================="
 
-	def open(self)
+	def open(self):
+		print "=================="
 		print "open gripper"
 		# close gripper
 		rospy.sleep(2)
@@ -92,14 +79,15 @@ class pick_object(object):
 		grip_data.data = 0.5
 		self.pub_gripper.publish(grip_data)
 		rospy.sleep(2)
-
+		print "=================="
 
 	def home(self):
 
 		############################ Method : Joint values (Go home!)############################
 
 		# We can get the joint values from the group and adjust some of the values:
-
+		print "=================="
+		print "back home position"
 		# Go home!!!
 		joint_goal = self.move_group.get_current_joint_values()
 		joint_goal[0] = 0   		# arm_shoulder_pan_joint
@@ -114,11 +102,14 @@ class pick_object(object):
 
 		# Calling ``stop()`` ensures that there is no residual movement
 		self.move_group.stop()
+		print "back home finish"
+		print "=================="
+
 		
 	def onShutdown(self):
 		rospy.loginfo("Shutdown.")
 
-	def callback(self, data)
+	def callback(self, data):
 		############################ Method : Using IK to calculate joint value ############################
 
 		# After determining a specific point where arm should move, we input x,y,z,degree to calculate joint value for each wrist. 
