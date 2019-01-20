@@ -184,11 +184,11 @@ def object_color(img, show_image):
     lower_red = np.array([130,50,50])
     upper_red = np.array([180,255,255])
 
-    lower_blue = np.array([100,120,120])
-    upper_blue = np.array([110,255,255])
+    lower_green = np.array([100,120,120])
+    upper_green = np.array([110,255,255])
 
-    lower_green = np.array([85,80,80])
-    upper_green = np.array([95,255,255])
+    lower_blue = np.array([85,80,80])
+    upper_blue = np.array([95,255,255])
 
     red_mask = cv2.inRange(hsv_image, lower_red, upper_red)
     blue_mask = cv2.inRange(hsv_image, lower_blue, upper_blue)
