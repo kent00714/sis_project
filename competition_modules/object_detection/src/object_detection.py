@@ -208,19 +208,19 @@ def object_color(img, show_image):
 
         cv2.circle(show_image, (x_red[items] , y_red[items]), 2, (0,0,255), 5)
 
-        cv2.putText(show_image, color_label[items], (x_red[items] , y_red[items]) ,cv2.FONT_HERSHEY_SIMPLEX,1, (0, 0, 255), 1, cv2.LINE_AA)
+        cv2.putText(show_image, color_label[0], (x_red[items] , y_red[items]) ,cv2.FONT_HERSHEY_SIMPLEX,1, (255, 255, 255), 2, cv2.LINE_AA)
     
     for items in range(count_green):
 
         cv2.circle(show_image, (x_green[items] , y_green[items]), 2, (0,255,0), 5)
 
-        cv2.putText(show_image, color_label[i], (x_green[items] , y_green[items]) ,cv2.FONT_HERSHEY_SIMPLEX,1, (0, 255, 0), 1, cv2.LINE_AA)
+        cv2.putText(show_image, color_label[1], (x_green[items] , y_green[items]) ,cv2.FONT_HERSHEY_SIMPLEX,1, (255, 255, 255), 2, cv2.LINE_AA)
     
     for items in range(count_blue):
 
         cv2.circle(show_image, (x_blue[items] , y_blue[items]), 2, (0,0,255), 5)
 
-        cv2.putText(show_image, color_label[i], (x_blue[items] , y_blue[items]) ,cv2.FONT_HERSHEY_SIMPLEX,1, (0, 0, 255), 1, cv2.LINE_AA)
+        cv2.putText(show_image, color_label[2], (x_blue[items] , y_blue[items]) ,cv2.FONT_HERSHEY_SIMPLEX,1, (255, 255, 255), 2, cv2.LINE_AA)
     
 
     return (show_image)
