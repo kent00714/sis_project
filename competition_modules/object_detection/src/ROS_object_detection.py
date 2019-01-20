@@ -198,7 +198,7 @@ class ROS_NODE(object):
 
                 try:
 
-                    self.publisher.publish(self.bridge.cv2_to_imgmsg(mask, str(i)))
+                    self.publisher.publish(self.bridge.cv2_to_imgmsg(mask, "mono8"))
 
                 except CvBridgeError as e:
                     
