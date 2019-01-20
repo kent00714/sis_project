@@ -194,7 +194,7 @@ def object_color(img, show_image):
     blue_mask = cv2.inRange(hsv_image, lower_blue, upper_blue)
     green_mask = cv2.inRange(hsv_image, lower_green, upper_green)
 
-    win_size = 70
+    win_size = 25
 
     count_red  , contour_red  , area_red  , x_red  , y_red   = find_contour(red_mask,   height, width, win_size)
     count_green, contour_green, area_green, x_green, y_green = find_contour(green_mask, height, width, win_size)
@@ -246,7 +246,7 @@ if __name__ == "__main__":
 
     task = input("task : ")
 
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
     
     count = 0
 
