@@ -2,6 +2,6 @@
   <!-- Realsense Camera -->
   <include file="$(find realsense_camera)/launch/sr300_nodelet_rgbd.launch"/>
   <!-- Object detection-->
-  <node pkg="object_detection" type="object"_detection_ros.py name="kent_object" output="screen"/>
+  <node pkg="object_detection" type="object_detection_ros.py" name="object_detection_ros" output="screen"/>
 
 </launch>
