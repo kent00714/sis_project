@@ -13,6 +13,11 @@ find_package(catkin REQUIRED
     roscpp
   	geometry_msgs
   	tf
+    cv_bridge
+    rospy  
+    visualization_msgs
+    pcl_conversions
+    pcl_ros
 )
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -117,7 +122,7 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+ include
 ${catkin_INCLUDE_DIRS}
 )
 
@@ -205,3 +210,12 @@ ${catkin_INCLUDE_DIRS}
 add_executable(chad_transform src/chad_transform.cpp)
 target_link_libraries(chad_transform ${catkin_LIBRARIES})
 add_dependencies(chad_transform ${catkin_LIBRARIES})
+
+add_executable(cloud_icp_align src/cloud_icp_align.cpp)
+target_link_libraries(cloud_icp_align ${catkin_LIBRARIES})
+
+add_executable(cloud_icp_demo src/cloud_icp_demo.cpp)
+target_link_libraries(cloud_icp_demo ${catkin_LIBRARIES})
+
+add_executable(demo src/demo.cpp src/icp_pose_estimation.cpp src/icp_pose_estimation.h)
+target_link_libraries(demo ${catkin_LIBRARIES})

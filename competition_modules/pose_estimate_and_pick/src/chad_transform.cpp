@@ -6,9 +6,6 @@ ros::Publisher pub_pose;
 
 geometry_msgs::Point pose_cam;
 geometry_msgs::Point pose_base;
-tf::TransformListener listener;
-tf::StampedTransform Transform1;
-tf::StampedTransform Transform2;
 
 void pose_cb(const geometry_msgs::Point::ConstPtr msg){
   pose_cam = *msg;
@@ -19,6 +16,10 @@ void pose_cb(const geometry_msgs::Point::ConstPtr msg){
   R_target.getRotation(q);
   target.setOrigin(V_target);
   target.setRotation(q);
+
+  tf::TransformListener listener;
+  tf::StampedTransform Transform1;
+  tf::StampedTransform Transform2;
 
   try{
     ros::Time now = ros::Time::now();
@@ -56,19 +57,21 @@ void pose_cb(const geometry_msgs::Point::ConstPtr msg){
   arm2goal = car2arm.inverse() * car2cam * target;
 
   pose_base.x = arm2goal.getOrigin().x();
-  pose_base.x = arm2goal.getOrigin().y();
-  pose_base.x = arm2goal.getOrigin().z();
+  pose_base.y = arm2goal.getOrigin().y();
+  pose_base.z = arm2goal.getOrigin().z();
+
+  printf("pose : %f \t %f \t %f \n",pose_base.x, pose_base.y, pose_base.z);
 
   pub_pose.publish(pose_base);
 }
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "ncrl_test");
+  ros::init(argc, argv, "chad_transform");
   ros::NodeHandle nh;
 
   // declare subscriber and publisher
-  ros::Subscriber sub_pose = nh.subscribe<geometry_msgs::Point> ("sis_competition/chadlin/pose", 1000, pose_cb);
+  ros::Subscriber sub_pose = nh.subscribe<geometry_msgs::Point> ("sis_competition/chadlin/pose", 5, &pose_cb);
   pub_pose = nh.advertise<geometry_msgs::Point> ("sis_competition/chadlin/object", 2);
 
   ros::spin();

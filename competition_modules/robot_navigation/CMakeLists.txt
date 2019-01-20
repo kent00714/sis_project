@@ -10,12 +10,12 @@ project(robot_navigation)
 find_package(catkin REQUIRED
   message_generation
   roscpp
-	std_msgs
-	geometry_msgs
-	sensor_msgs
-	pcl_conversions
-	pcl_ros
-	cv_bridge
+  std_msgs
+  geometry_msgs
+  sensor_msgs
+  pcl_conversions
+  pcl_ros
+  cv_bridge
 )
 
 ## System dependencies are found with CMake's conventions
@@ -122,8 +122,8 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
-# ${catkin_INCLUDE_DIRS}
+ include
+ ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
