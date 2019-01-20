@@ -145,7 +145,7 @@ class ROS_NODE(object):
         rospy.init_node('Object_detection', anonymous=True)
 
         self.subscriber = rospy.Subscriber("/camera/rgb/image_rect_color", Image, self.callback)
-        self.publisher  = rospy.Publisher("/Object_detection/mask", Image, 1)
+        self.publisher  = rospy.Publisher("/Object_detection/mask", Image, queue_size = 1)
 
         self.bridge = CvBridge()
 
