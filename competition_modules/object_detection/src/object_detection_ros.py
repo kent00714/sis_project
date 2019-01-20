@@ -147,8 +147,6 @@ class object_task1(object):
 
         self.fcn_model.load_state_dict(torch.load(model_path))
 
-        rospy.init_node('object_task1', anonymous=True)
-
         self.subscriber = rospy.Subscriber("/camera/rgb/image_rect_color", Image, self.callback)
 
     def callback(self, data):
@@ -297,7 +295,9 @@ class object_task1(object):
 
 
 if __name__ == "__main__":
-
+    
+    rospy.init_node('object_detection_ros', anonymous=True)
+    
     model_path = "FCNs_mini_competition_batch10_epoch9_RMSprop_lr0.0001.pkl"
 
     task1_node = object_task1(model_path)
