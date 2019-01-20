@@ -86,3 +86,13 @@ TX2 $ x11vnc
 laptop $ vncviewer  -quality 0 -encodings "tight"  [your tx2 hostname].local:[port]
 
 TX2 $  docker run -it [--rm] --name [name] --net host -e DISPLAY=$DISPLAY -v /tmp/.X11-unix/:/tmp/.X11-unix --privileged -v /dev/bus/usb:/dev/bus/usb  [dockerhub account]/sis_competition:[task_name]
+
+(another terminal)
+
+TX2 $ xhost +
+
+TX2 $ docker exec -it [container name] bash
+
+***If you want to predict with fcn model, run the following command***
+
+tx2 $  docker run -it [--rm] --name [name] --device=/dev/nvhost-ctrl --device=/dev/nvhost-ctrl-gpu --device=/dev/nvhost-prof-gpu --device=/dev/nvmap --device=/dev/nvhost-gpu --device=/dev/nvhost-as-gpu -v /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/tegra --net host -e DISPLAY=$DISPLAY -v /tmp/.X11-unix/:/tmp/.X11-unix --privileged -v /dev/bus/usb:/dev/bus/usb -v /home/$USER:/hosthome [dockerhub account]/sis_competition:[task_name] [bash]
