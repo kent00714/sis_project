@@ -142,9 +142,7 @@ class ROS_NODE(object):
             self.fcn_model = nn.DataParallel(self.fcn_model, device_ids=num_gpu)
 
         self.fcn_model.load_state_dict(torch.load(model_path))
-
-        rospy.init_node('Object_detection', anonymous=True)
-
+        
         self.subscriber = rospy.Subscriber("/camera/rgb/image_rect_color", Image, self.callback)
         self.pub_num    = rospy.Publisher("/Object_detection/number", String, queue_size = 10)
 
@@ -238,7 +236,9 @@ class ROS_NODE(object):
 if __name__ == "__main__":
 
     # Define ROS publisher
-
+    
+    rospy.init_node('ROS_object_detection', anonymous=True)
+    
     model_path = "FCNs_mini_competition_batch10_epoch9_RMSprop_lr0.0001.pkl"
 
     object_node = ROS_NODE(model_path)
