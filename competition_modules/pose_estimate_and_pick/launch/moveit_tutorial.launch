@@ -1,3 +1,7 @@
 <launch>
-<node pkg="moveit_example" type="moveit_tutorial.py" name="moveit_tutorial" output="screen"/>
+<!-- node pkg="moveit_example" type="moveit_tutorial.py" name="moveit_tutorial" output="screen"/-->
+< node pkg="pose_estimation_and_pick" type="chad_pick.py" name="chad_pick" output="screen"/>
+< node pkg="pose_estimation_and_pick" type="chad_transform" name="chad_transform" output="screen"/>
+< node pkg="pose_estimation_and_pick" type="demo" name="demo" output="screen"/>
+<include file="$(find sis_arm_planning)/launch/manipulation_tx2.launch"></include>
 </launch>

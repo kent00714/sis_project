@@ -1,17 +1,22 @@
 #include <ros/ros.h>
 #include <geometry_msgs/Point.h>
+#include <geometry_msgs/PoseStamped.h>
 #include <tf/transform_listener.h>
 
 ros::Publisher pub_pose;
 
-geometry_msgs::Point pose_cam;
+geometry_msgs::PoseStamped pose_cam;
 geometry_msgs::Point pose_base;
 
-void pose_cb(const geometry_msgs::Point::ConstPtr msg){
+bool lock = true;
+
+void pose_cb(const geometry_msgs::PoseStamped::ConstPtr msg){
+  if (lock){
+  lock = false;
   pose_cam = *msg;
   tf::Transform target;
   tf::Matrix3x3 R_target(1, 0, 0, 0, 1, 0, 0, 0, 1);
-  tf::Vector3 V_target(pose_cam.x, pose_cam.y, pose_cam.z);
+  tf::Vector3 V_target(pose_cam.pose.position.x, pose_cam.pose.position.y, pose_cam.pose.position.z);
   tf::Quaternion q;
   R_target.getRotation(q);
   target.setOrigin(V_target);
@@ -63,6 +68,7 @@ void pose_cb(const geometry_msgs::Point::ConstPtr msg){
   printf("pose : %f \t %f \t %f \n",pose_base.x, pose_base.y, pose_base.z);
 
   pub_pose.publish(pose_base);
+  }
 }
 
 int main(int argc, char **argv)
@@ -71,7 +77,7 @@ int main(int argc, char **argv)
   ros::NodeHandle nh;
 
   // declare subscriber and publisher
-  ros::Subscriber sub_pose = nh.subscribe<geometry_msgs::Point> ("sis_competition/chadlin/pose", 5, &pose_cb);
+  ros::Subscriber sub_pose = nh.subscribe<geometry_msgs::PoseStamped> ("sis_competition/chadlin/pose", 5, &pose_cb);
   pub_pose = nh.advertise<geometry_msgs::Point> ("sis_competition/chadlin/object", 2);
 
   ros::spin();
