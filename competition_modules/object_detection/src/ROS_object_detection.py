@@ -145,11 +145,13 @@ class ROS_NODE(object):
         rospy.init_node('Object_detection', anonymous=True)
 
         self.subscriber = rospy.Subscriber("/camera/rgb/image_rect_color", Image, self.callback)
-        self.publisher  = rospy.Publisher("/Object_detection/mask", Image, queue_size = 1)
+
+
+        self.publisher  = rospy.Publisher("/Object_detection/mask", Image, queue_size = 10)
 
         self.bridge = CvBridge()
 
-        self.label = ["Kinder", "Doublemint", "Kusan"]
+        self.label = ["Doublemint", "Kinder", "Kusan"]
         self.label_color = [(0,0,255), (0,255,0), (255, 0, 0)]
 
 
@@ -182,24 +184,25 @@ class ROS_NODE(object):
 
             output_frame = cv2.inRange(pred_img[0], i, i)
 
-            output_frame = cv2.erode(output_frame,None,iterations = 3)
+            output_frame = cv2.erode(output_frame,None,iterations = 2)
 
-            output_frame = cv2.dilate(output_frame,None,iterations = 3)
+            output_frame = cv2.dilate(output_frame,None,iterations = 2)
 
             count, contours, area, x, y = self.find_contour(output_frame , output_frame.shape[0] , output_frame.shape[1] , 15)  
 
-            center_position = []
+            for con in range(count):
 
-            mask[:,:, i-1] = output_frame
-            
+                zero_mask = np.zeros_like(output_frame)
 
-        try:
+                mask = cv2.fillConvexPoly(zero_mask, contours[con], 255)
 
-            self.publisher.publish(self.bridge.cv2_to_imgmsg(mask, "bgr8"))
+                try:
 
-        except CvBridgeError as e:
-            
-            print(e)
+                    self.publisher.publish(self.bridge.cv2_to_imgmsg(mask, str(i)))
+
+                except CvBridgeError as e:
+                    
+                    print(e)
 
 
     def find_contour(self, frame , h , w , min_size):
@@ -240,25 +243,3 @@ if __name__ == "__main__":
         
     except KeyboardInterrupt:
         print("Shutting down")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
