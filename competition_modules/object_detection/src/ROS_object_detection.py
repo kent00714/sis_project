@@ -13,6 +13,7 @@ from torchvision.models.vgg import VGG
 
 import rospy
 from sensor_msgs.msg import Image
+from std_msgs.msg import String
 from cv_bridge import CvBridge, CvBridgeError
 
 
@@ -145,7 +146,7 @@ class ROS_NODE(object):
         rospy.init_node('Object_detection', anonymous=True)
 
         self.subscriber = rospy.Subscriber("/camera/rgb/image_rect_color", Image, self.callback)
-
+        self.pub_num    = rospy.Publisher("/Object_detection/number", String, queue_size = 10)
 
         self.publisher  = rospy.Publisher("/Object_detection/mask", Image, queue_size = 10)
 
@@ -179,9 +180,10 @@ class ROS_NODE(object):
         test_N, _, test_h, test_w = output_img.shape
         pred_img = output_img.transpose(0, 2, 3, 1).reshape(-1, n_class).argmax(axis = 1).reshape(test_N, test_h, test_w)
 
-
+        counter = 0
+        
         for i in range(1, 4, 1):
-
+            
             output_frame = cv2.inRange(pred_img[0], i, i)
 
             output_frame = cv2.erode(output_frame,None,iterations = 2)
@@ -191,6 +193,8 @@ class ROS_NODE(object):
             count, contours, area, x, y = self.find_contour(output_frame , output_frame.shape[0] , output_frame.shape[1] , 15)  
 
             for con in range(count):
+                
+                counter+=1
 
                 zero_mask = np.zeros_like(output_frame)
 
@@ -204,7 +208,8 @@ class ROS_NODE(object):
                     
                     print(e)
 
-
+        self.pub_num.publish(str(counter))
+        
     def find_contour(self, frame , h , w , min_size):
         ret, thresh = cv2.threshold(frame, 127, 255, cv2.THRESH_BINARY)
         _, tmp_contours, hierarchy = cv2.findContours( thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
