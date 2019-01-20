@@ -15,8 +15,10 @@ void pose_cb(const geometry_msgs::Point::ConstPtr msg){
   tf::Transform target;
   tf::Matrix3x3 R_target(1, 0, 0, 0, 1, 0, 0, 0, 1);
   tf::Vector3 V_target(pose_cam.x, pose_cam.y, pose_cam.z);
+  tf::Quaternion q;
+  R_target.getRotation(q);
   target.setOrigin(V_target);
-  target.setRotation(R_target);
+  target.setRotation(q);
 
   try{
     ros::Time now = ros::Time::now();
@@ -62,7 +64,7 @@ void pose_cb(const geometry_msgs::Point::ConstPtr msg){
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "chad_transform");
+  ros::init(argc, argv, "ncrl_test");
   ros::NodeHandle nh;
 
   // declare subscriber and publisher
