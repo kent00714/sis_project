@@ -186,7 +186,7 @@ class ROS_NODE(object):
 
             output_frame = cv2.dilate(output_frame,None,iterations = 3)
 
-            count, contours, area, x, y = self.find_contour(output_frame , output_frame.shape[0] , output_frame.shape[1] , 20)  
+            count, contours, area, x, y = self.find_contour(output_frame , output_frame.shape[0] , output_frame.shape[1] , 15)  
 
             center_position = []
 
