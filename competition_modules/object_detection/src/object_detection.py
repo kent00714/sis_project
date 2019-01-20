@@ -247,9 +247,11 @@ if __name__ == "__main__":
     task = input("task : ")
 
     cap = cv2.VideoCapture(0)
+    
+    count = 0
 
     while(cap.isOpened()):
-
+        count +=1
         ret, img = cap.read()
 
         if (ret != True):
@@ -263,6 +265,8 @@ if __name__ == "__main__":
             Detection = object_color(img, show_image)
 
             cv2.imshow("out", Detection)
+            cv2.imwrite("color"+str(count)+".jpg", Detection)
+            
             cv2.waitKey(1)            
 
         if (task == 1):
@@ -284,6 +288,7 @@ if __name__ == "__main__":
             Detection  = object_commodity(output_img, show_image)
 
             cv2.imshow("out", Detection)
+            cv2.imwrite("commo"+str(count)+".jpg", Detection)
             cv2.waitKey(1)
 
 
