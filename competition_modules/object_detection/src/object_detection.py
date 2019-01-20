@@ -12,7 +12,6 @@ from torchvision import models
 from torchvision.models.vgg import VGG
 
 import numpy as np
-import scipy.misc
 import os, sys, time, cv2
 
 
@@ -126,7 +125,7 @@ def make_layers(cfg, batch_norm=False):
 
 def find_contour(frame , h , w , min_size):
     ret, thresh = cv2.threshold(frame, 127, 255, cv2.THRESH_BINARY)
-    tmp_contours, hierarchy = cv2.findContours( thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+    _, tmp_contours, hierarchy = cv2.findContours( thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
     contour = []
     contour_area = []
     contour_center_x_position = []
@@ -159,7 +158,7 @@ def object_commodity(img, show_image):
 
         output_frame = cv2.inRange(pred_img[0], i, i)
 
-        count, contours, area, x, y = find_contour(output_frame , output_frame.shape[0] , output_frame.shape[1] , 20)  
+        count, contours, area, x, y = find_contour(output_frame , output_frame.shape[0] , output_frame.shape[1] , 18)  
 
         cv2.drawContours(show_image , contours , -1 , (0,0,255) , thickness=2)
         
@@ -169,7 +168,7 @@ def object_commodity(img, show_image):
 
             cv2.circle(show_image, (x[items] , y[items]), 2, (0,0,255), 5)
 
-            cv2.putText(show_image, label[i], (x[items] , y[items]) ,cv2.FONT_HERSHEY_SIMPLEX,1, (0, 255, 255), 1, cv2.LINE_AA)
+            cv2.putText(show_image, label[i-1], (x[items] , y[items]) ,cv2.FONT_HERSHEY_SIMPLEX,1, (0, 255, 255), 1, cv2.LINE_AA)
             
 
     return (show_image)
