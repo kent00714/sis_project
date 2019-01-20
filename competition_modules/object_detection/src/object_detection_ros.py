@@ -138,6 +138,8 @@ class object_task1(object):
 
         num_gpu = list(range(torch.cuda.device_count()))
 
+        self.bridge = CvBridge()
+
         if torch.cuda.is_available():
             self.vgg_model = self.vgg_model.cuda()
             self.fcn_model = self.fcn_model.cuda()
@@ -149,7 +151,7 @@ class object_task1(object):
 
         self.subscriber = rospy.Subscriber("/camera/rgb/image_rect_color", Image, self.callback)
 
-    def callback(self):
+    def callback(self, data):
 
         img = self.bridge.imgmsg_to_cv2(data, "bgr8")  
 
