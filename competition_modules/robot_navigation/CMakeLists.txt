@@ -9,6 +9,13 @@ project(robot_navigation)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED
   message_generation
+  roscpp
+  std_msgs
+  geometry_msgs
+  sensor_msgs
+  pcl_conversions
+  pcl_ros
+  cv_bridge
 )
 
 ## System dependencies are found with CMake's conventions
@@ -115,8 +122,8 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
-# ${catkin_INCLUDE_DIRS}
+ include
+ ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -196,3 +203,5 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+add_executable(offb_ctrl src/offb_ctrl.cpp)
+target_link_libraries(offb_ctrl ${catkin_LIBRARIES})

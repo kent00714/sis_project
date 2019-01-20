@@ -7,8 +7,18 @@ project(pose_estimate_and_pick)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED)
-
+find_package(catkin REQUIRED
+    message_generation
+    std_msgs
+    roscpp
+  	geometry_msgs
+  	tf
+    cv_bridge
+    rospy  
+    visualization_msgs
+    pcl_conversions
+    pcl_ros
+)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -50,11 +60,11 @@ find_package(catkin REQUIRED)
 # )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+add_service_files(
+  FILES
+  tag.srv
+  home.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -64,10 +74,10 @@ find_package(catkin REQUIRED)
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs  # Or other packages containing msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs  # Or other packages containing msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -100,7 +110,7 @@ find_package(catkin REQUIRED)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES pose_estimate_and_pick
+#  LIBRARIES place_to_box
 #  CATKIN_DEPENDS other_catkin_pkg
 #  DEPENDS system_lib
 )
@@ -112,13 +122,13 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
-# ${catkin_INCLUDE_DIRS}
+ include
+${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/pose_estimate_and_pick.cpp
+#   src/${PROJECT_NAME}/place_to_box.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -129,7 +139,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/pose_estimate_and_pick_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/place_to_box_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -186,10 +196,26 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_pose_estimate_and_pick.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_place_to_box.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+## Add folders to be run by python nosetests
+# catkin_add_nosetests(test)
+
+add_executable(chad_transform src/chad_transform.cpp)
+target_link_libraries(chad_transform ${catkin_LIBRARIES})
+add_dependencies(chad_transform ${catkin_LIBRARIES})
+
+add_executable(cloud_icp_align src/cloud_icp_align.cpp)
+target_link_libraries(cloud_icp_align ${catkin_LIBRARIES})
+
+add_executable(cloud_icp_demo src/cloud_icp_demo.cpp)
+target_link_libraries(cloud_icp_demo ${catkin_LIBRARIES})
+
+add_executable(demo src/demo.cpp src/icp_pose_estimation.cpp src/icp_pose_estimation.h)
+target_link_libraries(demo ${catkin_LIBRARIES})
