@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import torch, torchvision
 import torch.nn as nn
 import torch.optim as optim
@@ -9,15 +11,9 @@ from torch.utils.data import Dataset, DataLoader
 from torchvision import models
 from torchvision.models.vgg import VGG
 
-from sklearn.metrics import confusion_matrix
-from matplotlib import pyplot as plt
 import numpy as np
-import pandas as pd
 import scipy.misc
 import os, sys, time, cv2
-
-if '/opt/ros/kinetic/lib/python2.7/dist-packages' in sys.path:
-    sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
 
 
 ranges = {
@@ -41,10 +37,13 @@ val_w     = w
 n_class   = 4
 
 
+label = ["Doublemint", "Kinder", "Kusan"]
+color_label = ["Red", "Blue", "Green"]
+
 class FCN16s(nn.Module):
 
     def __init__(self, pretrained_net, n_class):
-        super().__init__()
+        super(FCN16s, self).__init__()
 
         self.n_class = n_class
 
@@ -81,7 +80,7 @@ class FCN16s(nn.Module):
 
 class VGGNet(VGG):
     def __init__(self, pretrained=True, model='vgg16', requires_grad=True, remove_fc=True, show_params=False):
-        super().__init__(make_layers(cfg[model]))
+        super(VGGNet, self).__init__(make_layers(cfg[model]))
         self.ranges = ranges[model]
 
         if pretrained:
@@ -124,6 +123,7 @@ def make_layers(cfg, batch_norm=False):
             in_channels = v
     return nn.Sequential(*layers)
 
+
 def find_contour(frame , h , w , min_size):
     ret, thresh = cv2.threshold(frame, 127, 255, cv2.THRESH_BINARY)
     tmp_contours, hierarchy = cv2.findContours( thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
@@ -147,6 +147,87 @@ def find_contour(frame , h , w , min_size):
     return (len(contour) , contour , contour_area , contour_center_x_position , contour_center_y_position)
 
 
+def object_commodity(img, show_image):
+
+    test_N, _, test_h, test_w = img.shape
+
+    pred_img = img.transpose(0, 2, 3, 1).reshape(-1, n_class).argmax(axis = 1).reshape(test_N, test_h, test_w)
+
+    center_position = []
+
+    for i in range(1, 4, 1):
+
+        output_frame = cv2.inRange(pred_img[0], i, i)
+
+        count, contours, area, x, y = find_contour(output_frame , output_frame.shape[0] , output_frame.shape[1] , 20)  
+
+        cv2.drawContours(show_image , contours , -1 , (0,0,255) , thickness=2)
+        
+        for items in range(count): 
+
+            center_position.append((x[items] , y[items]))
+
+            cv2.circle(show_image, (x[items] , y[items]), 2, (0,0,255), 5)
+
+            cv2.putText(show_image, label[i], (x[items] , y[items]) ,cv2.FONT_HERSHEY_SIMPLEX,1, (0, 255, 255), 1, cv2.LINE_AA)
+            
+
+    return (show_image)
+
+
+def object_color(img, show_image):
+
+    height, width, channels = img.shape
+
+    hsv_image = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    image_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    lower_red = np.array([130,50,50])
+    upper_red = np.array([180,255,255])
+
+    lower_blue = np.array([100,120,120])
+    upper_blue = np.array([110,255,255])
+
+    lower_green = np.array([85,80,80])
+    upper_green = np.array([95,255,255])
+
+    red_mask = cv2.inRange(hsv_image, lower_red, upper_red)
+    blue_mask = cv2.inRange(hsv_image, lower_blue, upper_blue)
+    green_mask = cv2.inRange(hsv_image, lower_green, upper_green)
+
+    win_size = 70
+
+    count_red  , contour_red  , area_red  , x_red  , y_red   = find_contour(red_mask,   height, width, win_size)
+    count_green, contour_green, area_green, x_green, y_green = find_contour(green_mask, height, width, win_size)
+    count_blue , contour_blue , area_blue , x_blue , y_blue  = find_contour(blue_mask,  height, width, win_size)
+    
+    cv2.drawContours(show_image,contour_red,-1,(0,0,255),3)
+    cv2.drawContours(show_image,contour_green,-1,(255,0,0),3)
+    cv2.drawContours(show_image,contour_blue,-1,(0,255,0),3)
+
+    for items in range(count_red):
+
+        cv2.circle(show_image, (x_red[items] , y_red[items]), 2, (0,0,255), 5)
+
+        cv2.putText(show_image, color_label[items], (x_red[items] , y_red[items]) ,cv2.FONT_HERSHEY_SIMPLEX,1, (0, 0, 255), 1, cv2.LINE_AA)
+    
+    for items in range(count_green):
+
+        cv2.circle(show_image, (x_green[items] , y_green[items]), 2, (0,255,0), 5)
+
+        cv2.putText(show_image, color_label[i], (x_green[items] , y_green[items]) ,cv2.FONT_HERSHEY_SIMPLEX,1, (0, 255, 0), 1, cv2.LINE_AA)
+    
+    for items in range(count_blue):
+
+        cv2.circle(show_image, (x_blue[items] , y_blue[items]), 2, (0,0,255), 5)
+
+        cv2.putText(show_image, color_label[i], (x_blue[items] , y_blue[items]) ,cv2.FONT_HERSHEY_SIMPLEX,1, (0, 0, 255), 1, cv2.LINE_AA)
+    
+
+    return (show_image)
+
+
+
 if __name__ == "__main__":
 
     vgg_model = VGGNet(requires_grad=True, remove_fc=True)
@@ -164,6 +245,7 @@ if __name__ == "__main__":
 
     fcn_model.load_state_dict(torch.load(model_path))
 
+    task = input("task : ")
 
     cap = cv2.VideoCapture(0)
 
@@ -176,42 +258,34 @@ if __name__ == "__main__":
 
         show_image = img.copy()
 
-        img = np.transpose(img,(2,0,1))/255.
 
-        img[0] -= means[0]
-        img[1] -= means[1]
-        img[2] -= means[2]
+        if (task == 0):
 
-        img = np.expand_dims(img, axis=0)
+            Detection = object_color(img, show_image)
 
-        input_img = torch.from_numpy(img).cuda()
-        input_img = input_img.float()
+            cv2.imshow("out", Detection)
+            cv2.waitKey(1)            
 
-        output_img = fcn_model(input_img)
-        output_img = output_img.data.cpu().numpy()
+        if (task == 1):
 
-        test_N, _, test_h, test_w = output_img.shape
-        pred_img = output_img.transpose(0, 2, 3, 1).reshape(-1, n_class).argmax(axis = 1).reshape(test_N, test_h, test_w)
+            img = np.transpose(img,(2,0,1))/255.
 
+            img[0] -= means[0]
+            img[1] -= means[1]
+            img[2] -= means[2]
 
-        for i in range(1, 4, 1):
+            img = np.expand_dims(img, axis=0)
 
-	        output_frame = cv2.inRange(pred_img[0], i, i)
+            input_img = torch.from_numpy(img).cuda()
+            input_img = input_img.float()
 
-	        count, contours, area, x, y = find_contour(output_frame , output_frame.shape[0] , output_frame.shape[1] , 20)  
+            output_img = fcn_model(input_img)
+            output_img = output_img.data.cpu().numpy()
 
-	        cv2.drawContours(show_image , contours , -1 , (0,0,255) , thickness=2)
+            Detection  = object_commodity(output_img, show_image)
 
-	        center_position = []
-	        
-	        for items in range(count): 
-	            cv2.circle(show_image, (x[items] , y[items]), 2, (0,0,255), 5)
-	            cv2.putText(show_image, str(x[items])+","+str(y[items]), (x[items] , y[items]),cv2.FONT_HERSHEY_SIMPLEX,1, (0, 255, 255), 1, cv2.LINE_AA)
-	            center_position.append((x[items] , y[items]))
-
-
-        cv2.imshow("out", show_image)
-        cv2.waitKey(1)
+            cv2.imshow("out", Detection)
+            cv2.waitKey(1)
 
 
 
