@@ -224,6 +224,10 @@ class object_task1(object):
         for i in range(1, 4, 1):
 
             output_frame = cv2.inRange(pred_img[0], i, i)
+            
+            output_frame = cv2.erode(output_frame,None,iterations = 2)
+
+            output_frame = cv2.dilate(output_frame,None,iterations = 2)
 
             count, contours, area, x, y = self.find_contour(output_frame , output_frame.shape[0] , output_frame.shape[1] , 18)  
 
@@ -251,17 +255,27 @@ class object_task1(object):
         lower_red = np.array([130,50,50])
         upper_red = np.array([180,255,255])
 
-        lower_green = np.array([100,120,120])
-        upper_green = np.array([110,255,255])
+        lower_green = np.array([30,50,50])
+        upper_green = np.array([60,255,255])
 
-        lower_blue = np.array([85,80,80])
-        upper_blue = np.array([95,255,255])
+        lower_blue = np.array([70,120,120])
+        upper_blue = np.array([110,255,255])
 
         red_mask = cv2.inRange(hsv_image, lower_red, upper_red)
         blue_mask = cv2.inRange(hsv_image, lower_blue, upper_blue)
         green_mask = cv2.inRange(hsv_image, lower_green, upper_green)
+        
+        red_mask = cv2.erode(red_mask,None,iterations = 2)
+        red_mask = cv2.dilate(red_mask,None,iterations = 2)
+        
+        blue_mask = cv2.erode(blue_mask,None,iterations = 2)
+        blue_mask = cv2.dilate(blue_mask,None,iterations = 2)
+        
+        green_mask = cv2.erode(green_mask,None,iterations = 2)
+        green_mask = cv2.dilate(green_mask,None,iterations = 2)
+        
 
-        win_size = 25
+        win_size = 20
 
         count_red  , contour_red  , area_red  , x_red  , y_red   = self.find_contour(red_mask,   height, width, win_size)
         count_green, contour_green, area_green, x_green, y_green = self.find_contour(green_mask, height, width, win_size)
