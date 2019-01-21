@@ -113,6 +113,8 @@ class pick_object(object):
 	def callback(self, data):
 		############################ Method : Using IK to calculate joint value ############################
 
+		self.open()
+
 		# After determining a specific point where arm should move, we input x,y,z,degree to calculate joint value for each wrist. 
 		print "receive object pose"
 		pose_goal = Pose()
