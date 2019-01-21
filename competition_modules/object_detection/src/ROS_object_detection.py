@@ -199,7 +199,7 @@ class ROS_NODE(object):
                 mask = cv2.fillConvexPoly(zero_mask, contours[con], 255)
 
                 try:
-
+                    rospy.sleep(0.5)
                     self.publisher.publish(self.bridge.cv2_to_imgmsg(mask, "mono8"))
 
                 except CvBridgeError as e:
