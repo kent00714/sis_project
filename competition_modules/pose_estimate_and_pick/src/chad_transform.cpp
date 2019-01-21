@@ -7,7 +7,7 @@
 ros::Publisher pub_pose;
 
 geometry_msgs::PoseStamped pose_cam;
-geometry_msgs::Point pose_base;
+geometry_msgs::Point pose_base; 
 
 bool lock = true;
 
